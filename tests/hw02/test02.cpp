@@ -10,7 +10,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
 
-#include "/home/jay/c++/junjie.wang_tasks/hw02/hw02.h"
+#include "hw02.h"
 
 // require at least c++20
 static_assert(__cplusplus >= 202002L);

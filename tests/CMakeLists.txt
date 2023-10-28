@@ -7,6 +7,7 @@ include(doctest)
 #  add_hw_test(execname libraryame sourcefile.cpp othersource.cpp...)
 function(add_hw_test name library)
     add_executable(${name} ${ARGN})
+
     target_link_libraries(${name} PRIVATE doctest::doctest ${library} pthread)
     target_compile_features(${name} PUBLIC cxx_std_20)
 
