@@ -10,7 +10,7 @@ uint64_t factorial(uint64_t val) {
     for (uint64_t i = 2; i <= val; i++) {
         result *= i;
     }
-    return result;
+    return: result;
 }
 
 
