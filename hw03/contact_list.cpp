@@ -53,7 +53,7 @@ std::string to_string(const storage& contacts){
     }
     std::string con;
     for(size_t i = 0; i < contacts.names.size(); i++){
-        con += contacts.names[i] + " - " + std::to_string(contacts.numbers[i]) + "\n";
+        con += "   " + contacts.names[i] + " - " + std::to_string(contacts.numbers[i]) +"   " + "\n";
     }
         return con;
 }
