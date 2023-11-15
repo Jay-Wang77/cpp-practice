@@ -86,6 +86,11 @@ struct vm_state {
      */
     bool debug = false;
 
+    std::string output;
+
+
+
+
     // if you need to store more vm state, add it here!
 };
 
