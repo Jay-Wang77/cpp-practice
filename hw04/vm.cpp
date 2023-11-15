@@ -114,7 +114,6 @@ vm_state create_vm(bool debug) {
         if (vmstate.stack.empty()) throw vm_stackfail{"empty"};
         if (vmstate.stack.top() == 0) {
             vmstate.pc = arg;
-
         }
         vmstate.stack.pop();
         return true;
@@ -221,27 +220,27 @@ std::tuple<item_t, std::string> run(vm_state& vm, const code_t& code) {
         vm.pc += 1;
         if(op_id == vm.instruction_ids["JMP"]){
             if(static_cast<size_t>(arg) >= code.size() || arg < 0){
-                throw vm_segfault{"error"};
+                throw vm_segfault{"invalid address"};
             }
-        }
-        if(op_id == vm.instruction_ids["JMPZ"]) {
-            if (vm.stack.empty()) {
-                throw vm_stackfail{"empty"};
-            }
-            if (static_cast<size_t>(arg) >= code.size() || arg < 0) {
-                throw vm_segfault{"error"};
-            }
-        }
-        auto it = vm.instruction_actions.find(op_id);
-        if(it != vm.instruction_actions.end()){
-            bool continueExecution = it->second(vm, arg);
-            if(!continueExecution){
-                break;
-            }
-        }else{
-            throw vm_segfault{"error" + std::to_string(vm.pc - 1)};
         }
 
+        if(op_id == vm.instruction_ids["JMPZ"]){
+            if(vm.stack.empty()){
+                throw vm_stackfail{"empty"};
+            }
+            if(static_cast<size_t>(arg) >= code.size() || arg < 0){
+                throw vm_segfault{"invalid address"};
+            }
+
+        }
+
+        auto it = vm.instruction_actions.find(op_id);
+        bool continue_execution = it->second(vm, arg);
+        //if(it == vm.instruction_actions.end()){
+            //throw vm_segfault{"error"};}
+        if (!continue_execution) {
+            break;
+        }
         // TODO execute instruction and stop if the action returns false.
     }
     item_t exit_value{0};
