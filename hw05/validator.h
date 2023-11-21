@@ -16,6 +16,12 @@ struct Invalid {};
 /// into the invalid state, only the semicolon is allowed.
 struct Valid {};
 
+struct SelectStmt {};
+struct AllColumns {};
+struct NamedColumn {};
+struct MoreColumns {};
+struct FromClause {};
+struct TableName {};
 // TODO: all new states go between here...
 
 } // namespace state
@@ -23,7 +29,8 @@ struct Valid {};
 /// variant of all possible states of our finite machine
 /// TODO: Add all the possible states to the variant
 using State =
-    std::variant<state::Start, state::Invalid, state::Valid>;
+    std::variant<state::Start, state::Invalid, state::Valid, state::SelectStmt,
+     state::AllColumns, state::NamedColumn, state::MoreColumns, state::FromClause, state::TableName>;
 
 /// Transition from the `Start` state to the next state depending on the given
 /// token
@@ -40,6 +47,12 @@ State transition(state::Valid, const Token &token);
 [[nodiscard]]
 State transition(state::Invalid, const Token &token);
 
+State transition(state::SelectStmt, const Token &token);
+State transition(state::AllColumns, const Token &token);
+State transition(state::NamedColumn, const Token &token);
+State transition(state::MoreColumns, const Token &token);
+State transition(state::FromClause, const Token &token);
+State transition(state::TableName, const Token &token);
 // TODO: all of the transition functions from the newly created states go
 // between here...
 // ... and here
@@ -60,6 +73,10 @@ public:
     /// TODO: Implement this member function
     /// Moves from one state to the next given the token.
     void handle(const Token &token);
+
+    State get_state() const{
+        return state_;
+    }
 
 private:
     State state_ = state::Start{};
