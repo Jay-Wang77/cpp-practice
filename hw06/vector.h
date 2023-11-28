@@ -3,7 +3,8 @@
 #include <ostream>
 #include <utility>
 #include <vector>
-
+#ifndef VECTOR_H
+#define VECTOR_H
 namespace linalg {
 
 /**
@@ -20,13 +21,13 @@ public:
     Vector() = default;
 
     /// Construct non-initialized vector with given size
-    explicit Vector(std::size_t n);
+    explicit Vector(std::size_t n) : data_(static_cast<std::vector<float>::size_type>(n)) {};
 
     /// Construct vector with given size and initialized with the given value
     Vector(std::size_t n, float val);
 
     /// Construct vector with initialize list
-    explicit Vector(std::initializer_list<float> list);
+    explicit Vector(std::initializer_list<float> list):data_{list}{}
 
     /// Assign the given value to the vector, all coefficients in the vector are
     /// then equal to `val`
@@ -229,3 +230,4 @@ auto operator-(float val, const Vector &x) -> Vector;
 /// given vector and the scalar
 auto operator*(float val, const Vector &x) -> Vector;
 } // namespace linalg
+#endif  // VECTOR_H
