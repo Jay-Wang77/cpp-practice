@@ -4,11 +4,13 @@
 #include <istream>
 #include <span>
 #include <string_view>
+#include <sys/socket.h>
 
 namespace net {
 /// Light wrapper around the libc send(3)-function. Should return the value returned by send(3), and
 /// the options should be set to 0.
 [[nodiscard]] ssize_t send(int fd, std::span<const char> data);
+
 
 /// Light wrapper around libc recv(3)-function. Should return the value returned by recv(3), and the
 /// options should be set to 0;

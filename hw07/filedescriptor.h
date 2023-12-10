@@ -1,7 +1,6 @@
 #pragma once
 
 #include <optional>
-
 namespace net {
 
 /// Wrapper for a Linux style file descriptor. It represents a potentially empty file descriptor.
@@ -31,6 +30,11 @@ public:
     /// Check out: close(3)
     ~FileDescriptor();
 
+    FileDescriptor(const FileDescriptor&) = delete;
+    FileDescriptor& operator=(const FileDescriptor&) = delete;
+    //ensure objects take hold a unique ownership of the file descriptors.
+    FileDescriptor(FileDescriptor&& other);
+    FileDescriptor& operator=(FileDescriptor&& other);
     // TODO: Implement both copy and move constructors and assignment operators for the ownership model
     //       described in the class description.
 

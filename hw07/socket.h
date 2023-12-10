@@ -52,6 +52,11 @@ public:
     /// Connect to localhost on the given port, see the other overload
     Connection connect(uint16_t port);
 
+    FileDescriptor release_fd() {
+        return std::move(fd_);
+    }
+
+
     /// Return the int to the file descriptor
     int fd() const;
 
