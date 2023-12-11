@@ -13,9 +13,9 @@ namespace net {
 class Server {
 public:
     explicit Server(uint16_t port);
-    Connection accept();
+    Connection accept() const;
 private:
-    Socket listen_socket_;
+    Socket socket;
 
 };
 

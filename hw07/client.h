@@ -16,10 +16,10 @@ namespace net {
 class Client {
 public:
     Client() = default;
-    Connection connect(uint16_t port);
     Connection connect(const std::string& destination, uint16_t port);
+    Connection connect(uint16_t port);
 private:
-    Socket socket_;
+    Socket socket;
 };
 
 } // namespace net

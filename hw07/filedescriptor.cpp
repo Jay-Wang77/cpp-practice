@@ -3,14 +3,13 @@
 // TODO Implement the methods of the FileDescriptor class as given in the filedescriptor.h header.
 
 namespace net{
+    FileDescriptor::FileDescriptor() : fd_(std::nullopt) {}
 
-    FileDescriptor::FileDescriptor(): fd_(std::nullopt){}
+    FileDescriptor::FileDescriptor(int fd) : fd_(fd) {}
 
-    FileDescriptor::FileDescriptor(int fd): fd_(fd){}
-
-    FileDescriptor::~FileDescriptor(){
-        if(fd_.has_value()){
-            close(fd_.value());
+    FileDescriptor::~FileDescriptor() {
+        if (fd_) {
+            close(*fd_);
         }
     }
     //once the file descriptor owns the descriptor it will be closed when it goes out of scope.
@@ -32,6 +31,6 @@ namespace net{
     }
 
     int FileDescriptor::unwrap() const {
-        return fd_ or (-1);
+        return fd_.value_or(-1);
     }
 }

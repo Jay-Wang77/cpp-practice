@@ -11,7 +11,8 @@ namespace net{
 
     Connection::Connection(FileDescriptor&& fd) : fd_(std::move(fd)) {}
     void Connection::send(std::string_view data) const {
-        if (::send(fd_.unwrap(), data.data(), data.size(), 0) < 0) {
+        ssize_t result = ::send(fd_.unwrap(), data.data(), data.size(), 0);
+        if (result == -1) {
             throw std::runtime_error("Send failed");
         }
     }
