@@ -73,11 +73,12 @@ protected:
     FileContent content;
 
     // TODO additional member variables
-
+    std::weak_ptr<Filesystem> filesystem;
 private:
     /**
      * The file name.
      * Is empty as long as the file is not registered in a filesystem.
      */
+     //empty string
     std::string name;
 };

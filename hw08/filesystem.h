@@ -81,4 +81,6 @@ public:
 
 private:
   // TODO store the files
+  // query file object by file name
+  std::unordered_map<std::string, std::shared_ptr<File>> files;
 };
