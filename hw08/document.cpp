@@ -1,5 +1,5 @@
 #include "document.h"
-
+#include <algorithm>
 // accepts a para. of rvalue reference type: content
 // the ownership of content move to File from original object.
 Document::Document(FileContent &&content) : File{std::move(content)} {}
