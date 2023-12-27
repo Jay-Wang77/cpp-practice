@@ -135,7 +135,8 @@ public:
                 resize(1);
             }
         }
-        _data[_size++] = std::move(value);
+        //_data[_size++] = std::move(value);
+        _data[_size++] = value;
     }
 
     /**
@@ -199,7 +200,7 @@ public:
 
     reverse_iterator rbegin() { return reverse_iterator(end()); }
     reverse_iterator rend() { return reverse_iterator(begin()); }
-    const_reverse_iterator regin() const {return const_reverse_iterator(end);}
+    const_reverse_iterator rbegin() const {return const_reverse_iterator(end);}
     const_reverse_iterator rend() const {return const_reverse_iterator(begin);}
 
     const_reverse_iterator crbegin() const { return const_reverse_iterator(end()); }
