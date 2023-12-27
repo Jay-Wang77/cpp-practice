@@ -115,7 +115,7 @@ public:
     void push_back(const_reference value){
         if(_size >= _capacity){
             if(_capacity > 0){
-                resize(_capacity * 2);
+                resize(_capacity * growth_factor);
             }else{
                 resize(1);
             }
@@ -130,7 +130,7 @@ public:
         //_data = std::make_unique<value_type[]>(_size);
         if(_size >= _capacity){
             if(_capacity > 0){
-                resize(_capacity * 2);
+                resize(_capacity * growth_factor);
             }else{
                 resize(1);
             }
@@ -239,7 +239,7 @@ private:
         } else if (_capacity >= new_size) {
             _capacity = _capacity;
         } else {
-            _capacity = _capacity * 2;
+            _capacity = _capacity * growth_factor;
         }
         return _capacity;
     }
