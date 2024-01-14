@@ -21,7 +21,35 @@ namespace bencode {
 // - Handle empty string
 // - Handle if a non-digit number is between 'i' and 'e'
 consteval std::optional<int> parse_int(std::string_view str) {
-    return {};
+    if(str.empty() || str.front() != 'i' || str.back() != 'e'){
+        return std::nullopt;
+    }
+
+    str.remove_prefix(1);
+    str.remove_suffix(1);
+    if (str.empty()) {
+    return std::nullopt;
+    }
+    int value = 0;
+    bool isNegative = false;
+    size_t index = 0;
+
+    if (str[index] == '-') {
+        isNegative = true;
+        ++index;
+        if (str.size() == 1) { // 只有一个负号
+            return std::nullopt;
+        }
+    }
+    while (index < str.size()) {
+        char c = str[index];
+        if (c < '0' || c > '9') {
+            return std::nullopt; // 非数字字符
+        }
+        value = value * 10 + (c - '0');
+        ++index;
+    }
+    return isNegative ? -value : value;
 }
 
 // TODO: Implement byte string parsing for the bencode fromat
@@ -42,6 +70,27 @@ consteval std::optional<int> parse_int(std::string_view str) {
 // - It is NOT valid for the string to be shorter than the specified length
 // - The string may contain colons
 consteval std::optional<std::string_view> parse_byte_string(std::string_view str) {
-    return {};
+    if (str.empty()) {
+        return std::nullopt;
+    }
+    int length = 0;
+    int index = 0;
+    while (index < str.size() && str[index] != ':') {
+        if (str[index] < '0' || str[index] > '9') {
+            return std::nullopt;
+        }
+        length = length * 10 + (str[index] - '0');
+        index++;
+        }
+
+    if (str.size() < static_cast<size_t>(index + length)) {
+        return std::nullopt;
+    }
+    index++;
+    if (str.size() < static_cast<size_t>(index + length)) {
+        return std::nullopt;
+    }
+
+    return std::string_view(str.data() + index, length);
 }
 } // namespace bencode
