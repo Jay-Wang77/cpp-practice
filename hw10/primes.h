@@ -46,5 +46,5 @@ struct Power {
 
 template<int base, int modulus>
 struct Power<base, 0, modulus> {
-    static const int value = 1;
+    static const int value = modulus == 1 ? 0 : 1;
 };
