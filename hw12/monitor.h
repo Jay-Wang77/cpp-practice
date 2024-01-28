@@ -29,4 +29,6 @@ private:
     mutable Logger logger;
     std::chrono::duration<int, std::milli> interval;
     // TODO: Do you need anything here?
+    std::string targetPath;
+    std::unordered_map<std::filesystem::path, std::filesystem::file_time_type> filesLastModified;
 };

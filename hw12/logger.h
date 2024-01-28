@@ -27,7 +27,7 @@ public:
     Logger(const std::string& filename = "log.txt");
 
     void log(const std::string& path, status what);
-
+    ~Logger();
 private:
     std::ofstream file;
 };

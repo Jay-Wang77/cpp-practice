@@ -1,11 +1,22 @@
 #include "logger.h"
-
+#include <filesystem>
 #include <ctime>
 #include <chrono>
 
 
 
 Logger::Logger(const std::string &filename) : file{} {
+    if(std::filesystem::exists(filename)){
+        std::string backup_filename = filename + "_old";
+        if(std::filesystem::exists(backup_filename)){
+            std::filesystem::remove(backup_filename);
+        }
+        std::filesystem::rename(filename,backup_filename);
+    }
+    file.open(filename);
+    if (!file.is_open()) {
+        throw std::runtime_error("Can not open file: " + filename);
+    }
     std::time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     file << "Commencing logging for directory: "
          << "TODO: insert current path here.."
@@ -35,3 +46,9 @@ void Logger::log(const std::string &path, status what) {
         break;
     }
 }
+Logger::~Logger(){
+    if(file.is_open()){
+        file.close();
+    }
+}
+
