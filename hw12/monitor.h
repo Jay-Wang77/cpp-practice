@@ -4,9 +4,9 @@
 #include <unordered_map>
 #include <string>
 #include <filesystem>
-
+#include <mutex>
 #include "logger.h"
-
+namespace fs = std::filesystem;
 /**
  * The File Monitor class keeps a record of files in the targetPath and their last modification time
  * Once the monitor has been started, it will continue checking every interval for new, modified and deleted files
@@ -17,7 +17,7 @@ public:
     FileMonitor(const std::string &targetpath,
                 std::chrono::milliseconds interval = std::chrono::milliseconds(1'000),
                 const std::string &logfile = "log.txt");
-
+    std::unordered_map<std::string, fs::file_time_type> fileTimestamps;
     /**
      * Run the monitor.
      * Check the directory every `interval` until `timeout`.
@@ -30,5 +30,5 @@ private:
     std::chrono::duration<int, std::milli> interval;
     // TODO: Do you need anything here?
     std::string targetPath;
-    std::unordered_map<std::filesystem::path, std::filesystem::file_time_type> filesLastModified;
+    std::mutex monitorMutex;
 };

@@ -3,19 +3,18 @@
 #include <ctime>
 #include <chrono>
 
-
+namespace fs = std::filesystem;
 
 Logger::Logger(const std::string &filename) : file{} {
-    if(std::filesystem::exists(filename)){
-        std::string backup_filename = filename + "_old";
-        if(std::filesystem::exists(backup_filename)){
-            std::filesystem::remove(backup_filename);
-        }
-        std::filesystem::rename(filename,backup_filename);
+    fs::path logPath(filename);
+    fs::path backupPath = logPath;
+    backupPath += "_old";
+    if (fs::exists(logPath)) {
+        fs::rename(logPath, backupPath);
     }
-    file.open(filename);
+    file.open(logPath);
     if (!file.is_open()) {
-        throw std::runtime_error("Can not open file: " + filename);
+        throw std::runtime_error("can not open log file.");
     }
     std::time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     file << "Commencing logging for directory: "
@@ -25,7 +24,11 @@ Logger::Logger(const std::string &filename) : file{} {
          << std::ctime(&time)
          << std::endl;
 }
-
+Logger::~Logger() {
+    if (file.is_open()) {
+        file.close();
+    }
+}
 void Logger::log(const std::string &path, status what) {
     if (not file.is_open()) {
         throw std::runtime_error("File could not be opened!");
@@ -44,11 +47,6 @@ void Logger::log(const std::string &path, status what) {
     default:
         file << "? Error! Unknown file status detected for: " << path << std::endl;
         break;
-    }
-}
-Logger::~Logger(){
-    if(file.is_open()){
-        file.close();
     }
 }
 

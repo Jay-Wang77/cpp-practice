@@ -4,10 +4,7 @@
 #include <filesystem>
 #include <iostream>
 #include <unordered_set>
-std::chrono::system_clock::time_point to_system_clock(const std::filesystem::file_time_type &tp) {
-    using namespace std::chrono;
-    return system_clock::time_point(duration_cast<system_clock::duration>(tp.time_since_epoch()));
-}
+namespace fs = std::filesystem;
 FileMonitor::FileMonitor(const std::string &targetpath,
                          std::chrono::milliseconds interval,
                          const std::string &logfilename)
@@ -15,9 +12,10 @@ FileMonitor::FileMonitor(const std::string &targetpath,
     , interval{interval},
       targetPath{targetpath}
 {
-    for (const auto &entry : std::filesystem::directory_iterator(targetPath)) {
-        if (entry.is_regular_file()) {
-            filesLastModified[entry.path()] = std::filesystem::last_write_time(entry);
+    for (const auto &entry : fs::directory_iterator(targetPath)) {
+        if (fs::is_regular_file(entry.status())) {
+            auto fileTime = fs::last_write_time(entry);
+            fileTimestamps[entry.path().string()] = fileTime;
         }
     }
     // TODO: Initialize a mapping for all files in the target path
@@ -29,25 +27,33 @@ void FileMonitor::start(std::chrono::seconds timeout) {
     // Every given interval, check for modifications to the files and log it
     auto startTime = std::chrono::system_clock::now();
     while (std::chrono::system_clock::now() - startTime < timeout) {
-        std::unordered_map<std::filesystem::path, std::filesystem::file_time_type> currentFiles;
-        std::unordered_set<std::filesystem::path> checkedFiles;
-        for (const auto &entry : std::filesystem::directory_iterator(targetPath)) {
-            auto currentPath = entry.path();
-            auto currentLastWriteTime = std::filesystem::last_write_time(entry);
-            currentFiles[currentPath] = currentLastWriteTime;
-            if (filesLastModified.find(currentPath) == filesLastModified.end()) {
-                logger.log(currentPath.string(), status::added);
-            } else if (filesLastModified[currentPath] != currentLastWriteTime) {
-                logger.log(currentPath.string(), status::changed);
-            }
-            checkedFiles.insert(currentPath);
-        }
-        for (const auto &file : filesLastModified) {
-            if (checkedFiles.find(file.first) == checkedFiles.end()) {
-                logger.log(file.first.string(), status::removed);
-            }
-        }
-        filesLastModified = std::move(currentFiles);
         std::this_thread::sleep_for(interval);
+        std::lock_guard<std::mutex> guard(monitorMutex);
+        std::unordered_set<std::string> currentFiles;
+
+        for (const auto &entry : fs::recursive_directory_iterator(targetPath)) {
+            std::string path = entry.path().string();
+            currentFiles.insert(path);
+            if (fs::is_regular_file(entry.status()) || fs::is_directory(entry.status())) {
+                auto fileTime = fs::last_write_time(entry);
+
+                auto it = fileTimestamps.find(path);
+                if (it == fileTimestamps.end()) {
+                    logger.log(path, status::added);
+                    fileTimestamps[path] = fileTime;
+                } else if (it->second != fileTime) {
+                    logger.log(path, status::changed);
+                    it->second = fileTime;
+                }
+            }
+        }
+        for (auto it = fileTimestamps.begin(); it != fileTimestamps.end();) {
+            if (currentFiles.find(it->first) == currentFiles.end()) {
+                logger.log(it->first, status::removed);
+                it = fileTimestamps.erase(it);
+            } else {
+                ++it;
+            }
+        }
     }
 }
